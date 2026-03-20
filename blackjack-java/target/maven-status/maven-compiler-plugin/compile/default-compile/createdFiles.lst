@@ -1,0 +1,5 @@
+com\blackjack\model\Card.class
+com\blackjack\model\Deck.class
+com\blackjack\model\Suit.class
+com\blackjack\model\Rank.class
+com\blackjack\model\Hand.class
