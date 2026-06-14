@@ -1,143 +1,57 @@
-# Projekt Blackjack — Java + Python
+# Projekt Blackjack: Symulator i Analiza Statystyczna
 
-Konsolowa gra Blackjack z modułem symulacji i analizy statystycznej.
+Zaawansowany symulator gry Blackjack zaimplementowany w języku **Java**, wyposażony w moduł uczenia maszynowego (automatycznych decyzji) oraz mechanizmy analizy danych przy użyciu języka **Python** (Pandas, Seaborn).
 
-## Struktura projektu
+Projekt pozwala z niesamowitą szybkością rozegrać miliony rozdań pod nadzorem różnych algorytmów analitycznych (BOTów). Udowadnia matematycznie przewagę kasyna w długim terminie i ukazuje, w jakim stopniu **liczenie kart (Hi-Lo, Zen Count)** potrafi to ryzyko zminimalizować, a nawet odwrócić expected value (EV) na korzyść gracza.
 
+## Architektura i Koncepcja
+Aplikacja została ściśle podzielona na dwa mikroserwisy (warstwy), aby odseparować silnik generujący zdarzenia od warstwy podsumowującej liczby.
+
+1. **Silnik Symulacyjny (Java 17 / Maven)** - Orkiestruje zasady gry, przydziela karty z buta (Shoe) i oblicza matematycznie optymalne ruchy bota przy stole za pomocą klasy `BasicStrategy`. Odpowiada za logikę liczenia kart i Bet Spreading ($1 - $500). Rezultatami setek tysięcy gier pluje bez obciążenia pamięci prosto do wierszowego pliku CSV.
+2. **Platforma Analityczna (Python 3)** - System zbudowano w celu wizualizacji surowych danych. Służą do tego biblioteki `Pandas` (data mining) i `Seaborn` (wykresy wizualne). Pokazuje ostateczne różnice miedzy algorytmami na pięknych wykresach typu bar/plot.
+
+---
+
+## 🤖 Wdrożone Algorytmy i Strategie
+
+Silnik posiada 6 różnych modułów decyzyjnych gracza, począwszy od algorytmów uproszczonych, aż po algorytmy oszukujące prawdopodobieństwo:
+
+| Nazwa strategii           | Algorytm i Działanie |
+|---------------------------|----------------------------------------------------------|
+| **Simple 15**             | Dobiera karty póki nie osiągnie minimum 15 pkt. |
+| **Mimic Dealer**          | Małpuje zachowanie krupiera; twarde żelazne stanięcie na wartości 17. |
+| **Never Bust**            | System tchórzliwy - nie dobiera gdy ma ponad 11, bo boi się spalić. |
+| **Advanced Casino**       | Książkowa, idealna strategia matematyczna uwzględniająca Double Down i tabelę kasynową. Gra płaskimi stawkami (Flat betting). |
+| **Counter Hi-Lo**         | Śledzi układ odnalezionych kart systemem poziomu 1 (+1 / -1). Jeśli *True Count* staje się duży, wykorzystuje wahania statystyki, aby potężnie podwyższyć zakład i zgarnąć dużą pulę. Zmienia ułamkowo ruchy (tzw. "Deviations").|
+| **Counter Zen (Poziom 2)**| Agresywny algorytm liczący typu 2 (Level-2 Counting). Dokładniej określa wagę kart niskich i średnich (aż +2). Nadrabia mniejszą częstotliwość wystąpień dokładniejszymi zyskami. Posiada zmodyfikowaną tabelę Bet-Spread. |
+
+---
+
+## 🛠 Instalacja i Uruchomienie
+
+### 1. Wymagania:
+* Java (wersja 17 lub wyższa) + Maven
+* Python (wersja 3.8 lub wyższa) z zainstalowanym `pandas`, `matplotlib`, `seaborn`
+
+### 2. Rozruch Silnika Gry (Java)
+Uruchomienie generatora (symulacji). Wygeneruje ona potężny plik tekstowy (.csv).
+```bash
+cd blackjack-java
+mvn clean install
+mvn exec:java -Dexec.mainClass="com.blackjack.ui.ConsoleUI"
 ```
-projekt-blackjack/
-│
-├── blackjack-java/                        # Cała logika gry w Javie
-│   └── src/
-│       ├── main/java/com/blackjack/
-│       │   ├── model/                     # Obiekty: karta, talia, ręka, gracz
-│       │   ├── logic/                     # Zasady gry, liczenie punktów
-│       │   ├── simulation/                # Symulacja wielu gier
-│       │   ├── export/                    # Zapis wyników do CSV
-│       │   └── ui/                        # Interfejs konsolowy (wejście/wyjście)
-│       └── test/java/com/blackjack/       # Testy jednostkowe
-│
-├── blackjack-python/                      # Analiza danych w Pythonie
-│   ├── data/                              # Lokalna kopia CSV (opcjonalnie)
-│   ├── analysis/                          # Skrypty analizujące dane
-│   └── charts/                            # Wygenerowane wykresy
-│
-├── data-output/                           # CSV generowane przez Javę
-└── docs/                                  # Notatki, diagramy, przemyślenia
+
+### 3. Rendering Danych Cząstkowych (Python)
+Następnie wystarczy przejść do folderu ze skryptem analityki. System natychmiast skonsumuje CSV i zapisze raporty (.png).
+```bash
+cd ../blackjack-python/analysis
+pip install -r requirements.txt  # jezeli jeszcze nie masz
+python compare_strategies.py
 ```
 
----
+## Moduł Krupiera (Deck i But)
+Zastosowaliśmy profesjonalną penetrację kasynową - The Cut Card zablokowana jest na głębokości ok ~75% kart. But zawsze składa się z 6 Standardowych Talii po 52 karty.
 
-## Pakiety Java i ich odpowiedzialność
-
-### `com.blackjack.model` — obiekty danych
-Tutaj mieszkają "rzeczy" w grze. Nie zawierają logiki gry — tylko dane.
-
-| Klasa | Co robi |
-|---|---|
-| `Suit` | Enum: HEARTS, DIAMONDS, CLUBS, SPADES — kolory kart |
-| `Rank` | Enum: TWO–TEN, JACK, QUEEN, KING, ACE — wartości kart |
-| `Card` | Jedna karta (Rank + Suit). Umie się wypisać, np. "ACE of SPADES" |
-| `Deck` | Talia 52 kart. Umie się potasować i wydać kartę |
-| `Hand` | Ręka gracza lub krupiera — lista kart + liczenie punktów + obsługa Asa |
-
-### `com.blackjack.logic` — zasady gry
-Tutaj mieszkają "reguły". Klasy te operują na obiektach z `model`.
-
-| Klasa | Co robi |
-|---|---|
-| `HandEvaluator` | Liczy punkty ręki (obsługuje Asa jako 1 lub 11) |
-| `DealerStrategy` | Logika krupiera: dobiera karty poniżej 17, staje na 17+ |
-| `GameResult` | Enum lub klasa: WIN, LOSE, PUSH (remis), BLACKJACK |
-| `GameRules` | Stałe i reguły: krupier staje na 17, Blackjack = 21 z 2 kart, itp. |
-
-### `com.blackjack.ui` — interfejs konsolowy
-Odpowiada wyłącznie za komunikację z użytkownikiem.
-
-| Klasa | Co robi |
-|---|---|
-| `ConsoleInput` | Czyta decyzje gracza (hit/stand) z klawiatury |
-| `ConsoleOutput` | Wypisuje stan gry, karty, wyniki |
-
-### `com.blackjack.export` — zapis danych
-Zbiera dane z rozegranych gier i zapisuje je do CSV.
-
-| Klasa | Co robi |
-|---|---|
-| `GameRecord` | Jeden rekord gry: karty, wynik, decyzje gracza |
-| `CsvExporter` | Zapisuje listę `GameRecord` do pliku CSV |
-
-### `com.blackjack.simulation` — symulacja (etap 2)
-Uruchamia wiele gier automatycznie bez udziału człowieka.
-
-| Klasa | Co robi |
-|---|---|
-| `SimulationRunner` | Rozgrywa N gier automatycznie |
-| `BasicStrategy` | Prosta strategia decyzji gracza (na podstawie tabeli Blackjack) |
-
----
-
-## Kolejność implementacji
-
-### ETAP 1 — Fundament modelu (zacznij tutaj)
-Nie ma żadnej logiki gry — tylko czyste obiekty danych.
-
-1. `Rank` (enum z wartościami)
-2. `Suit` (enum z kolorami)
-3. `Card` (trzyma Rank + Suit, umie się wypisać)
-4. `Deck` (lista 52 kart, tasowanie, dobieranie)
-5. `Hand` (lista kart, prosta suma punktów bez Asa na start)
-
-**Cel etapu 1:** Móc napisać kod: "stwórz talię, dobierz kartę, dodaj do ręki".
-
----
-
-### ETAP 2 — Liczenie punktów
-6. `HandEvaluator` — logika sumowania z obsługą Asa (1 lub 11)
-7. `GameRules` — stałe: limit krupiera (17), wartość Blackjacka (21)
-
-**Cel etapu 2:** Móc sprawdzić: "czy gracz ma bust? Czy ma Blackjacka?"
-
----
-
-### ETAP 3 — Prosta gra konsolowa
-8. `ConsoleOutput` — wypisywanie kart i punktów
-9. `ConsoleInput` — odczyt decyzji gracza
-10. `DealerStrategy` — logika ruchów krupiera
-11. `GameResult` — wyznaczanie zwycięzcy
-12. Główna klasa `Main` — spina wszystko w jedną grę
-
-**Cel etapu 3:** Zagrać pełną partię w konsoli: rozdanie, hit/stand, wynik.
-
----
-
-### ETAP 4 — Zapis do CSV
-13. `GameRecord` — struktura danych jednej rozegrianej gry
-14. `CsvExporter` — zapis do pliku w `data-output/`
-
-**Cel etapu 4:** Po każdej grze powstaje wpis w CSV.
-
----
-
-### ETAP 5 — Symulacja (wiele gier)
-15. `BasicStrategy` — automatyczna strategia gracza
-16. `SimulationRunner` — pętla N gier bez konsoli
-
-**Cel etapu 5:** Uruchomić 10 000 gier i zebrać dane.
-
----
-
-### ETAP 6 — Analiza w Pythonie
-17. Wczytanie CSV (pandas)
-18. Statystyki: win rate, push rate, bust rate
-19. Wykresy (matplotlib / seaborn)
-20. Analiza decyzji gracza
-
----
-
-## Ważne zasady projektu
-- Prostota ponad spryt — kod ma być czytelny
-- Każda klasa robi jedną rzecz (zasada SRP)
-- Etap po etapie — nie skacz do przodu
-- Konsola na początku, żadnego GUI
-- Brak bazy danych — tylko CSV
+## Najciężej zdobyte wnioski
+1. Samo liczenie kart, bez absolutnie żelaznego **Książkowego Basic Strategy** przynosi zerowy sens. Gra agresywna polega na budowaniu ułamków procenta przewagi. Nierozdzielenie pary asów obala wielogodzinną pracę systemu zliczającego talie.
+2. Card Counting naturalnie **nie wygrywa większej liczby rozdań**. Generuje nadwyżkę w całkowitym kapitale gracza, grając minimalnymi zakładami (lub całkowicie porzucając grę), gdy na horyzoncie jest zły moment, a obładowując ryzykowną pozycję na full margin, gdy statystyka w talii (True Count) świeci się na czerwono.
