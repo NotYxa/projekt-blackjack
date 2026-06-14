@@ -1,5 +1,16 @@
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\export\GameRecord.java
 C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Rank.java
 C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Hand.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\logic\HandEvaluator.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Dealer.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\ui\ConsoleUI.java
 C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Deck.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\export\CsvExporter.java
 C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Suit.java
 C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Card.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\logic\GameRules.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\simulation\BasicStrategy.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\simulation\SimulationRunner.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\logic\GameResult.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\model\Player.java
+C:\Users\Dell\Documents\GitHub\projekt-blackjack\blackjack-java\src\main\java\com\blackjack\logic\BlackjackGame.java

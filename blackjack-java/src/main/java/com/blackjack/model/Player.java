@@ -4,7 +4,7 @@ package com.blackjack.model;
  * Reprezentuje gracza uczestniczącego w grze.
  */
 public class Player {
-    private final Hand hand;
+    private Hand hand;
 
     public Player() {
         this.hand = new Hand();
@@ -15,7 +15,11 @@ public class Player {
         return hand;
     }
 
+    public void setHand(Hand hand) {
+        this.hand = hand;
+    }
+
     public void reset() {
-        hand.clear();
+        hand = new Hand();
     }
 }

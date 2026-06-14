@@ -21,12 +21,11 @@ public enum Rank {
     EIGHT ("8",  8),
     NINE  ("9",  9),
     TEN   ("10", 10),
-    JACK  ("J",  10),  // Walet
-    QUEEN ("Q",  10),  // Dama
-    KING  ("K",  10),  // Król
+    JACK  ("J",  10),  
+    QUEEN ("Q",  10),  
+    KING  ("K",  10), 
     ACE   ("A",  11);  // As — domyślnie 11, HandEvaluator zmieni na 1 gdy trzeba
 
-    // Pola przechowujące wartości dla każdej stałej
     private final String displayName;
     private final int value;
 

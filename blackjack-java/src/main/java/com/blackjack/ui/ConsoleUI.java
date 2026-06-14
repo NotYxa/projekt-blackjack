@@ -3,6 +3,8 @@ package com.blackjack.ui;
 import java.util.List;
 import java.util.Scanner;
 
+import com.blackjack.export.CsvExporter;
+import com.blackjack.export.GameRecord;
 import com.blackjack.logic.BlackjackGame;
 import com.blackjack.logic.GameResult;
 import com.blackjack.model.Card;
@@ -10,10 +12,12 @@ import com.blackjack.model.Card;
 public class ConsoleUI {
     private final BlackjackGame game;
     private final Scanner scanner;
+    private final CsvExporter exporter;
 
     public ConsoleUI() {
         this.game = new BlackjackGame();
         this.scanner = new Scanner(System.in);
+        this.exporter = new CsvExporter("C:\\Users\\Dell\\Documents\\GitHub\\projekt-blackjack\\data-output\\results.csv");
     }
 
     public void start() {
@@ -97,6 +101,19 @@ public class ConsoleUI {
                 System.out.println("Remis (Push)!");
                 break;
         }
+
+        // --- ZAPIS DO CSV ---
+        int playerScore = game.getEvaluator().calculateValue(game.getPlayer().getHand());
+        int dealerScore = game.getEvaluator().calculateValue(game.getDealer().getHand());
+        int playerCardCount = game.getPlayer().getHand().getCards().size();
+
+        double profit = 0.0;
+        if (result == GameResult.PLAYER_WINS) profit = 10.0;
+        else if (result == GameResult.DEALER_WINS) profit = -10.0;
+
+        GameRecord record = new GameRecord("HUMAN_PLAYER", playerScore, dealerScore, result, playerCardCount, 10.0, profit, 0.0);
+        exporter.exportSingleGame(record);
+        System.out.println("[Info] Wynik gry zostal zapisany do CSV.");
     }
 
     private boolean askPlayAgain() {

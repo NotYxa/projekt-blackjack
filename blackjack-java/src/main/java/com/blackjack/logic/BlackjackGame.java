@@ -8,7 +8,7 @@ import com.blackjack.model.Player;
  * Główny silnik gry zawiadujący przebiegiem rundy.
  */
 public class BlackjackGame {
-    private Deck deck;
+    private final Deck deck;
     private final Player player;
     private final Dealer dealer;
     private final HandEvaluator evaluator;
@@ -17,15 +17,21 @@ public class BlackjackGame {
         this.player = new Player();
         this.dealer = new Dealer();
         this.evaluator = new HandEvaluator();
+        
+        // Kasynowy but z kartami (Shoe) - 6 talii
+        this.deck = new Deck(6);
+        this.deck.shuffle();
     }
 
     /**
      * Rozpoczyna nową rundę gry.
      */
     public void startRound() {
-        // 1. Otwieramy i tasujemy nową talię (dla uproszczenia nowa na każdą rundę)
-        deck = new Deck();
-        deck.shuffle();
+        // 1. Sprawdzamy czy but nie jest pusty. Wracamy do standardowego 75 kart.
+        if (deck.remainingCards() < 75) {
+            deck.reset();
+            deck.shuffle();
+        }
 
         // 2. Czyścimy stoły (ręce) gracza i krupiera
         player.reset();
@@ -90,4 +96,5 @@ public class BlackjackGame {
     public Player getPlayer() { return player; }
     public Dealer getDealer() { return dealer; }
     public HandEvaluator getEvaluator() { return evaluator; }
+    public Deck getDeck() { return deck; }
 }
